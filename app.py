@@ -1,42 +1,28 @@
 import streamlit as st
-import streamlit.components.v1 as components
+import pandas as pd
+import numpy as np
 
-st.title("📍 GPS連動・先行気象監視")
+st.title("📈 先行気象・時系列分析")
 
-# ブラウザから位置情報を取得するためのJavaScript
-js_code = """
-<script>
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            // ここで取得した座標をStreamlit側に渡すロジックが必要
-            document.body.innerHTML += "緯度: " + lat + ", 経度: " + lon;
-        }
-    );
-</script>
-"""
-components.html(js_code, height=100)
+# 1. 過去の気圧変化（履歴）をシミュレーション
+# 本来はDBやCSVに保存して蓄積します
+data = {
+    'time': ['12:30', '12:40', '12:50', '13:00', '13:10', '13:20', '13:30'],
+    'pressure': [1005.2, 1004.8, 1004.5, 1004.2, 1004.0, 1003.8, 1003.5]
+}
+df = pd.DataFrame(data)
 
-st.write("---")
+# 2. グラフの表示
+st.subheader("気圧の推移（過去1時間）")
+st.line_chart(df.set_index('time')['pressure'])
 
-# 位置情報が取得できたと仮定して、北九州の気象データを監視
-location = "北九州"
-st.subheader(f"現在地：{location} の先行観測データ")
-
-# シミュレーション（本来はここで現在地に最も近いアメダス地点をAPIから選別）
-pressure = 1003.5 # 現在の北九州の気圧を想定
-humidity = 87.0
-
-col1, col2 = st.columns(2)
-with col1:
-    st.metric("現在気圧", f"{pressure} hPa")
-with col2:
-    st.metric("現在湿度", f"{humidity} %")
-
-if pressure < 1005.0:
-    st.error("🚨 【緊急】現在地の気圧が急低下中！30分以内の天候悪化に備えてください。")
+# 3. 傾き（変化の勢い）から予測を表示
+st.write("### 予報解析")
+slope = (df['pressure'].iloc[-1] - df['pressure'].iloc[-2])
+if slope < 0:
+    st.write(f"📉 **現在の傾向:** 10分ごとに {abs(slope):.1f} hPa 低下中。")
+    st.write("→ **予測:** 気圧低下が止まらないため、今後30分〜1時間で天候がさらに悪化する可能性が高いです。")
 else:
-    st.success("✅ 現在地周辺の気象状況は正常です。")
+    st.write("📈 **現在の傾向:** 気圧は回復傾向です。")
 
-st.info("※ブラウザの位置情報設定を許可すると、移動しても常にその場所の気象データを監視します。")
+st.info("※グラフが右肩下がりなら「悪化」、右肩上がりなら「回復」の合図です。")
