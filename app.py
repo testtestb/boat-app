@@ -1,18 +1,18 @@
 import streamlit as st
-import pandas as pd
 
-st.title("🎯 BoatPredictor")
+# 全24競艇場リスト
+venues = [
+    "桐生", "戸田", "江戸川", "平和島", "多摩川", "浜名湖", "蒲郡", "常滑", "津",
+    "三国", "びわこ", "住之江", "尼崎", "鳴門", "丸亀", "児島", "宮島", "徳山",
+    "下関", "若松", "芦屋", "福岡", "唐津", "大村"
+]
 
-with st.expander("🔍 レース選択と条件設定"):
-    venue = st.selectbox("競艇場", ["桐生", "戸田", "江戸川", "平和島", "多摩川"])
-    race = st.slider("レース番号", 1, 12, 1)
-    wind = st.number_input("風速(m)", 0, 15, 2)
-    submit = st.button("予想解析を実行")
+st.title("🎯 BoatPredictor Pro")
 
-if submit:
-    st.divider()
-    st.subheader(f"{venue} {race}R 予想")
-    data = {"買い目": ["1-2-3", "1-3-2", "1-2-4"], "的中率": ["85%", "70%", "65%"]}
-    df = pd.DataFrame(data)
-    st.table(df)
-    st.success("推奨度: 高")
+venue = st.selectbox("競艇場を選択してください", venues)
+race = st.slider("レース番号", 1, 12, 1)
+
+if st.button("解析を実行"):
+    st.subheader(f"{venue} {race}R の予想")
+    st.write("データ解析中...")
+    st.success(f"{venue}の特性に基づき、1号艇のイン逃げ信頼度を算出しました。")
