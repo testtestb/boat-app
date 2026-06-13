@@ -1,27 +1,11 @@
-import SwiftUI
-import PhotosUI
+import streamlit as st
+from PIL import Image
 
-struct CameraView: View {
-    @State private var showingImagePicker = false
-    @State private var inputImage: UIImage?
+st.title("📸 ブラウザカメラアプリ")
 
-    var body: some View {
-        VStack {
-            Button("カメラを起動") {
-                self.showingImagePicker = true
-            }
-        }
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(image: $inputImage)
-        }
-        .onChange(of: inputImage) { _ in
-            saveImageToLibrary()
-        }
-    }
+# Streamlitのカメラ入力機能
+picture = st.camera_input("写真を撮る")
 
-    // 写真をライブラリに保存する関数
-    func saveImageToLibrary() {
-        guard let inputImage = inputImage else { return }
-        UIImageWriteToSavedPhotosAlbum(inputImage, nil, nil, nil)
-    }
-}
+if picture:
+    st.image(picture)
+    st.success("撮影完了！")
